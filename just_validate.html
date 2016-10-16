@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <title>Just validate</title>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+    <form>
+        <div id="validation-msg">&nbsp;</div>
+        <div>
+            <p>Please fill the fields below: </p>
+            <div>
+                <label for="number">Telephone (10 digits):</label><br />
+                <input type="text" id="number" name="number" maxlength="10" data-required="true" data-pattern="[0-9]{10}">
+            </div>
+            <p id="prompt-address">Please fill your address info:</p>
+            <div>
+                <label for="street">Street (not required):</label><br />
+                <input type="text" id="street" name="street" maxlength="60" data-required="false">
+            </div>
+            <div>
+                <label for="no">Number (up to 6 digits, required only if street is filled):</label><br />
+                <input type="text" id="no" name="no" maxlength="6" data-required="false" data-depends-to="street" data-pattern="[0-9]{1,6}">
+            </div>
+            <div>
+                <label for="zip">ZIP code (5 digits, required only if street is filled):</label><br />
+                <input type="text" id="zip" name="zip" maxlength="5" data-required="false" data-depends-to="street" data-pattern="[0-9]{5}">
+            </div>
+            <div>
+                <label for="zip">State (required only if street is filled):</label><br />
+                <select id="state" name="state" data-required="false" data-depends-to="street">
+                    <option value=""></option>
+                    <option value="MA">Massachusetts</option>
+                    <option value="AL">Alabama</option>
+                </select>
+            </div>
+        </div>
+        <br />
+        <div>
+            <input type="submit" />
+        </div>
+    </form>
+
+    <script src="./just_validate.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            // give callbacks for success and failure
+            $("form").on("submit", function (e) {
+                $(this).justValidate(function () {
+                    // the form is going to be submitted
+                    $("#validation-msg").html("Everything is well!");
+                }, function (elements) {
+                    // clear the validation output field
+                    $("#validation-msg").html("");
+                    for (var elementIdx = 0; elementIdx < elements.length; elementIdx++) {
+                        if (elements[elementIdx].reason === "required") {
+                            $("#validation-msg").append("Please fill all fields.<br />");
+                        } else if (elements[elementIdx].reason === "pattern") {
+                            $("#validation-msg").append("The values you filled-in are invalid.<br />");
+                        } else if (elements[elementIdx].reason === "dependency") {
+                            $("#validation-msg").append("Please fill the dependent field.<br />");
+                        }
+                    };
+
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
